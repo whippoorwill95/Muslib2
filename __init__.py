@@ -9,7 +9,7 @@ from Library.LibraryAlbum import LibraryAlbum
 from Library.LibrarySong import LibrarySong
 from Library.LibraryArtist import LibraryArtist
 from Library.LibraryUserTag import LibraryUserTag
-import pickle
+# import pickle
 
 
 # Сначала из ссылки на файл создаем объекты классов альбом песня артист без юзер тага пока что
@@ -20,3 +20,7 @@ import pickle
 
 
 path = r"M:\Sun Leads Me On"
+
+newlib = LibrarySong(path)
+for song in newlib.songs:
+    print(song.songName)

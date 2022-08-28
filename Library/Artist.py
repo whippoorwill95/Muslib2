@@ -7,7 +7,9 @@
 class Artist:
     """doc."""
 
-    # ArtistName = ""
+    def __init__(self, name):
+        """doc."""
+        self.artistName = name
 
     # Albums =
     # list with References to an Album object

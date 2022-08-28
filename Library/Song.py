@@ -1,12 +1,24 @@
 """doc."""
 
 
-# import Album from Album
-# import Artist from Artist
+from Album import Album
+from Artist import Artist
 # import UserTag from UserTag
+
 
 class Song:
     """doc."""
+
+    def __init__(self, songName, path, albumName, albums, artistName, artists):
+        """doc."""
+        self.songName = songName
+        self.path = path
+        self.userTags = set()
+        if albumName not in albums.albumName:
+            albums.add(Album(albumName))
+
+        if artistName not in artists:
+            artists.add(Artist(artistName))
 
     # SongName = ""
     # Path
