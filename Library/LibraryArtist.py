@@ -1,14 +1,12 @@
 """doc."""
 
 
-from LibraryAbstractBaseClass import LibraryABC
-
 
 Source = None
 # It's a plug
 
 
-class LibraryArtist(LibraryABC):
+class LibraryArtist:
     """doc."""
 
     def __init__(self, Source=None):

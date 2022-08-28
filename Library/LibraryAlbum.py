@@ -2,13 +2,12 @@
 
 
 # from Song import Song
-from LibraryAbstractBaseClass import LibraryABC
 
 Source = None
 # It's a plug
 
 
-class LibraryAlbum(LibraryABC):
+class LibraryAlbum:
     """doc."""
 
     def __init__(self, Source):

@@ -1,13 +1,13 @@
 """doc."""
 
 
-from LibraryAbstractBaseClass import LibraryABC
+import eyed3
 
 
 # It's a plug
 
 
-class LibrarySong(LibraryABC):
+class LibrarySong:
     """doc."""
 
     def __init__(self, Source=None):
@@ -20,3 +20,12 @@ class LibrarySong(LibraryABC):
         # main object is !Set of songs
         self.songs = set()
         # fill set with songs in Source
+    
+    @property
+    def TagObject(self, path):
+        """doc."""
+        try:
+            eyed3object = eyed3.load(path)
+            return eyed3object.tag
+        except eyed3.Error:
+            print("Error on reading tags")
