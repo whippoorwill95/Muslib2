@@ -13,7 +13,7 @@ class Song:
         """doc."""
         self.songName = songName
         self.path = path
-        # self.userTags = set()
+        self.userTags = set()
         # проверяем есть ли артист в библиотеке если нет создаём, если есть ссылаемся на него
         if artistName not in artists.keys():
             self.artist = Artist(self, artistName)
