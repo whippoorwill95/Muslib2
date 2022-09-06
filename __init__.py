@@ -1,14 +1,12 @@
 """doc."""
 
 
-from Library.Album import Album
-from Library.Song import Song
-from Library.Artist import Artist
-from Library.UserTag import UserTag
-from Library.LibraryAlbum import LibraryAlbum
-from Library.LibrarySong import LibrarySong
-from Library.LibraryArtist import LibraryArtist
-from Library.LibraryUserTag import LibraryUserTag
+# from Library.Album import Album
+# from Library.Song import Song
+# from Library.Artist import Artist
+# from Library.UserTag import UserTag
+from Library.Library import Library
+# from Library.LibraryUserTag import LibraryUserTag
 # import pickle
 
 
@@ -21,6 +19,9 @@ from Library.LibraryUserTag import LibraryUserTag
 
 path = r"M:\Sun Leads Me On"
 
-newlib = LibrarySong(path)
+newlib = Library(path)
 for song in newlib.songs:
-    print(song.songName)
+    print(song.songName, song.album.albumName, song.artist.artistName)
+
+for key, album in newlib.albums.items():
+    print(album.albumName)
