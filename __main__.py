@@ -32,7 +32,8 @@ import pickle
 #   pickle.dump(newlib, f)
 with open('library.pickle', 'rb') as f:
     library = pickle.load(f)
-library.makePlaylistFromUserTag("Listen-Friendly")
+# library.makePlaylistFromUserTag("Listen-Friendly")
+print(library.checkArtistNamesOnCaseDiversity())
 
 #             if records.index(i) != len(records)-1:
 #                 file.write(i[0] + "\n")

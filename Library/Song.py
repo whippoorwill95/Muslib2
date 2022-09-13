@@ -9,9 +9,9 @@ from Library.Artist import Artist
 class Song:
     """doc."""
 
-    def __init__(self, songName, path, albumName, albums, artistName, artists):
+    def __init__(self, title, path, albumName, albums, artistName, artists):
         """doc."""
-        self.songName = songName
+        self.title = title
         self.path = path
         self.userTags = set()
         # проверяем есть ли артист в библиотеке если нет создаём, если есть ссылаемся на него

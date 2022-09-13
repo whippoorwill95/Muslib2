@@ -23,7 +23,7 @@ class Library:
             for item in find(source, "*.[mf][pl][3a]*"):
                 song = eyed3.load(item)
                 self.songs.append(Song(song.tag.title, item, song.tag.album,
-                               self.albums, song.tag.artist, self.artists))
+                                  self.albums, song.tag.artist, self.artists))
 
     def aplyTagToAllLibrary(self, tagName):
         """doc."""
@@ -36,11 +36,76 @@ class Library:
             file.write("#EXTM3U" + "\n")
             for song in self.songs:
                 if tagName in song.userTags:
-                    #if song != deque(self.songs, 1):
+                    # if song != deque(self.songs, 1):
                     if song != self.songs[-1]:
                         file.write(song.path + "\n")
                     else:
                         file.write(song.path)
+
+    def checkArtistNamesOnCaseDiversity(self):
+        """doc."""
+        for song in self.songs:
+            for key in self.artists.keys():
+                if song.artist.artistName.lower() == key.lower():
+                    if song.artist.artistName != key:
+                        print(song.artist.artistName, "!=", key)
+                        return "fucked"
+        return "seems nothing wrong"
+
+    def addToLibrary(self, source):
+        """Add to library."""
+        for item in find(source, "*.[mf][pl][3a]*"):
+            song = eyed3.load(item)
+            self.songs.append(Song(song.tag.title, item, song.tag.album,
+                                   self.albums, song.tag.artist, self.artists))
+
+    def aplyTagToSong(self, title, artistName, tagName):
+        """Tag to song."""
+        # need to add check for versions of songs. I mean should i just transfer albumName to it or?..
+        for song in self.songs:
+            if title == song.title & song.artist.artistName == artistName:
+                song.userTags.add(tagName)
+
+    def aplyTagToAlbum(self, albumName, tagName):
+        """Tag to songs of album."""
+        for album in self.albums:
+            if albumName == album.albumName:
+                for song in album.songs:
+                    song.userTags.add(tagName)
+
+    def aplyTagToArtist(self, artistName, tagName):
+        """Tag to songs by artist."""
+        for artist in self.artists:
+            if artistName == artist.artistName:
+                for song in artist.songs:
+                    song.userTags.add(tagName)
+
+    def deleteTagFromSong(self, title, artistName, tagName):
+        """Delete tag from song."""
+        for song in self.songs:
+            if (title == song.title) & (artistName == song.artist.artistName):
+                if tagName in song.userTags:
+                    song.userTags.remove(tagName)
+
+    def deleteTagFromAlbum(self, albumName, tagName):
+        """Delete tag from album."""
+        for album in self.albums:
+            if albumName == album.albumName:
+                for song in album.songs:
+                    if tagName in song.userTags:
+                        song.userTags.remove(tagName)
+
+    def deleteTagFromArtist(self, artistName, tagName):
+        """Delete tag from artist."""
+        for artist in self.artists:
+            if artistName == artist.artistName:
+                for song in artist.songs:
+                    if tagName in song.userTags:
+                        song.userTags.remove(tagName)
+
+    def hideAuxiliaryArtists():
+        """Doc."""
+        pass
 
         # tagObjects = self.TagObject(Source)
         # foreach tag in tagobjects
