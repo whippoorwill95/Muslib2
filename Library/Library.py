@@ -25,12 +25,12 @@ class Library:
                 self.songs.append(Song(song.tag.title, item, song.tag.album,
                                   self.albums, song.tag.artist, self.artists))
 
-    def aplyTagToAllLibrary(self, tagName):
+    def aplyTagToAllLibrary(self, tagName: str) -> None:
         """doc."""
         for song in self.songs:
             song.userTags.add(tagName)
 
-    def makePlaylistFromUserTag(self, tagName):
+    def makePlaylistFromUserTag(self, tagName: str) -> None:
         """One Tag at start."""
         with open("pl.m3u8", "w", encoding="utf-8") as file:
             file.write("#EXTM3U" + "\n")
@@ -42,7 +42,7 @@ class Library:
                     else:
                         file.write(song.path)
 
-    def checkArtistNamesOnCaseDiversity(self):
+    def checkArtistNamesOnCaseDiversity(self) -> str:
         """doc."""
         for song in self.songs:
             for key in self.artists.keys():
@@ -52,42 +52,42 @@ class Library:
                         return "fucked"
         return "seems nothing wrong"
 
-    def addToLibrary(self, source):
+    def addToLibrary(self, source: str) -> None:
         """Add to library."""
         for item in find(source, "*.[mf][pl][3a]*"):
             song = eyed3.load(item)
             self.songs.append(Song(song.tag.title, item, song.tag.album,
                                    self.albums, song.tag.artist, self.artists))
 
-    def aplyTagToSong(self, title, artistName, tagName):
+    def aplyTagToSong(self, title: str, artistName: str, tagName: str) -> None:
         """Tag to song."""
         # need to add check for versions of songs. I mean should i just transfer albumName to it or?..
         for song in self.songs:
             if title == song.title & song.artist.artistName == artistName:
                 song.userTags.add(tagName)
 
-    def aplyTagToAlbum(self, albumName, tagName):
+    def aplyTagToAlbum(self, albumName: str, tagName: str) -> None:
         """Tag to songs of album."""
         for album in self.albums:
             if albumName == album.albumName:
                 for song in album.songs:
                     song.userTags.add(tagName)
 
-    def aplyTagToArtist(self, artistName, tagName):
+    def aplyTagToArtist(self, artistName: str, tagName: str) -> None:
         """Tag to songs by artist."""
         for artist in self.artists:
             if artistName == artist.artistName:
                 for song in artist.songs:
                     song.userTags.add(tagName)
 
-    def deleteTagFromSong(self, title, artistName, tagName):
+    def deleteTagFromSong(self, title: str, artistName: str, tagName: str) -> None:
         """Delete tag from song."""
         for song in self.songs:
             if (title == song.title) & (artistName == song.artist.artistName):
                 if tagName in song.userTags:
                     song.userTags.remove(tagName)
 
-    def deleteTagFromAlbum(self, albumName, tagName):
+    def deleteTagFromAlbum(self, albumName: str, tagName: str) -> None:
         """Delete tag from album."""
         for album in self.albums:
             if albumName == album.albumName:
@@ -95,7 +95,7 @@ class Library:
                     if tagName in song.userTags:
                         song.userTags.remove(tagName)
 
-    def deleteTagFromArtist(self, artistName, tagName):
+    def deleteTagFromArtist(self, artistName: str, tagName: str) -> None:
         """Delete tag from artist."""
         for artist in self.artists:
             if artistName == artist.artistName:
@@ -103,23 +103,10 @@ class Library:
                     if tagName in song.userTags:
                         song.userTags.remove(tagName)
 
+    def getNumberOfSongs(self) -> int:
+        """Get amount of songs in library."""
+        return self.songs.len()
+
     def hideAuxiliaryArtists():
         """Doc."""
         pass
-
-        # tagObjects = self.TagObject(Source)
-        # foreach tag in tagobjects
-        # song = new Song object
-        # songs.add(song)
-        # tagoobjects SHOULD BE set or list of eyed3.tag objects
-        # main object is !Set of songs
-        # fill set with songs in Source
-
-    # @property
-    # def TagObject(self, path):
-    #     """doc."""
-    #     try:
-    #         eyed3object = eyed3.load(path)
-    #         return eyed3object.tag
-    #     except eyed3.Error:
-    #         print("Error on reading tags")

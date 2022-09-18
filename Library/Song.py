@@ -3,13 +3,12 @@
 
 from Library.Album import Album
 from Library.Artist import Artist
-# import UserTag from UserTag
 
 
 class Song:
     """doc."""
 
-    def __init__(self, title, path, albumName, albums, artistName, artists):
+    def __init__(self, title: str, path: str, albumName: str, albums: dict, artistName: str, artists: dict):
         """doc."""
         self.title = title
         self.path = path
@@ -30,6 +29,3 @@ class Song:
             self.album = albums[(albumName, artistName)]
         self.album.addSong(self)
         self.artist.addSong(self)
-
-    # UserTags = set()
-    # Set of Usertags
