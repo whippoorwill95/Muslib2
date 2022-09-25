@@ -1,12 +1,12 @@
 """doc."""
 
 
-from Library.Album import Album
-from Library.Artist import Artist
+from .Artist import Artist
+from .Album import Album
 
 
 class Song:
-    """doc."""
+    """Represents a song."""
 
     def __init__(self, title: str, path: str, albumName: str, albums: dict, artistName: str, artists: dict):
         """doc."""

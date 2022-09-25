@@ -105,7 +105,7 @@ class Library:
 
     def getNumberOfSongs(self) -> int:
         """Get amount of songs in library."""
-        return self.songs.len()
+        return len(self.songs)
 
     def hideAuxiliaryArtists():
         """Doc."""

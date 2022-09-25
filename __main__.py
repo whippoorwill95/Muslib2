@@ -1,42 +1,64 @@
 """doc."""
 
 
-from Library.Library import Library
-import pickle
+# import pickle
 import sys
 from PyQt6.QtWidgets import (
     QApplication,
     QMainWindow,
     QVBoxLayout,
     QWidget,
-    QTableWidget
+    QTableWidget,
+    QTableWidgetItem
 )
+from Library.Library import Library
+# from PyQt6.QtCore import Qt
+# I use TYPE_CHECCKING to work with type hints without getting circular import error
+from typing import TYPE_CHECKING
 
-WINDOW_SIZE = 800
+
+if TYPE_CHECKING:
+    from Library.Song import Song
 
 
 class LibWindow(QMainWindow):
     """Main window (GUI or view)."""
 
-    def __init__(self):
+    def __init__(self, library):
         """Doc."""
         super().__init__()
         self.setWindowTitle("MusicLib2")
-        self.setFixedSize(WINDOW_SIZE, WINDOW_SIZE)
-        self.generalLayout = QVBoxLayout()
+        self.setGeometry(0, 30, 1000, 600)
+        generalLayout = QVBoxLayout()
         centralWidget = QWidget(self)
-        centralWidget.setLayout(self.generalLayout)
+        centralWidget.setLayout(generalLayout)
         self.setCentralWidget(centralWidget)
-        self._createTable()
 
-    def _createTable(self):
-        self.table = QTableWidget()
+        table = QTableWidget()
+        table.setColumnCount(3)
+        table.setRowCount(library.getNumberOfSongs())
+        table.setHorizontalHeaderLabels(["Title", "Album", "Artist"])
+        table.resizeColumnsToContents()
+
+        row = 0
+        song: 'Song'
+        for song in library.songs:
+            table.setItem(row, 1, QTableWidgetItem(song.title))
+            table.setItem(row, 1, QTableWidgetItem(song.album.albumName))
+            table.setItem(row, 2, QTableWidgetItem(song.artist.artistName))
+            row += 1
+
+        generalLayout.addWidget(table)
 
 
 def main():
     """Start application."""
+    # with open('library.pickle', 'rb') as f:
+    #    library = pickle.load(f)
+    path = r"M:\music\m4\3 Doors Down"
+    library = Library(path)
     musicLibApp = QApplication([])
-    musicLibWindow = LibWindow()
+    musicLibWindow = LibWindow(library)
     musicLibWindow.show()
     sys.exit(musicLibApp.exec())
 
@@ -63,8 +85,6 @@ if __name__ == "__main__":
 # newlib.aplyTagToAllLibrary("Listen-Friendly")
 # with open('library.pickle', 'wb') as f:
 #   pickle.dump(newlib, f)
-with open('library.pickle', 'rb') as f:
-    library = pickle.load(f)
 # library.makePlaylistFromUserTag("Listen-Friendly")
 # print(library.checkArtistNamesOnCaseDiversity())
 
