@@ -1,7 +1,7 @@
 """doc."""
 
 
-import eyed3
+from mutagen.id3 import ID3, ID3NoHeaderError
 from Library.Song import Song
 # from collections import deque
 # this shit is broken what deque is?
@@ -9,6 +9,11 @@ from Library.Song import Song
 
 # It's a plug
 from Utils.Search import find
+import logging
+import logging.config
+from logs.settings import logger_config
+logging.config.dictConfig(logger_config)
+logger = logging.getLogger('app_logger')
 
 
 class Library:
@@ -21,9 +26,13 @@ class Library:
         self.artists = dict()
         if source is not None:
             for item in find(source, "*.[mf][pl][3a]*"):
-                song = eyed3.load(item)
-                self.songs.append(Song(song.tag.title, item, song.tag.album,
-                                  self.albums, song.tag.artist, self.artists))
+                try:
+                    song = ID3(item)
+                    self.songs.append(Song(song["TIT2"].text[0], item, song["TALB"].text[0],
+                                      self.albums, song['TPE1'].text[0], self.artists))
+                except:
+                    logger.exception(f'item = {item}')
+                    pass
 
     def aplyTagToAllLibrary(self, tagName: str) -> None:
         """doc."""
@@ -52,12 +61,12 @@ class Library:
                         return "fucked"
         return "seems nothing wrong"
 
-    def addToLibrary(self, source: str) -> None:
-        """Add to library."""
-        for item in find(source, "*.[mf][pl][3a]*"):
-            song = eyed3.load(item)
-            self.songs.append(Song(song.tag.title, item, song.tag.album,
-                                   self.albums, song.tag.artist, self.artists))
+    # def addToLibrary(self, source: str) -> None:
+    #     """Add to library."""
+    #     for item in find(source, "*.[mf][pl][3a]*"):
+    #         song = eyed3.load(item)
+    #         self.songs.append(Song(song.tag.title, item, song.tag.album,
+    #                                self.albums, song.tag.artist, self.artists))
 
     def aplyTagToSong(self, title: str, artistName: str, tagName: str) -> None:
         """Tag to song."""

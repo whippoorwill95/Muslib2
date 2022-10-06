@@ -13,7 +13,7 @@ from PyQt6.QtWidgets import (
 )
 from Library.Library import Library
 # from PyQt6.QtCore import Qt
-# I use TYPE_CHECCKING to work with type hints without getting circular import error
+# I use TYPE_CHECCKING to use type hints without getting circular import error
 from typing import TYPE_CHECKING
 
 
@@ -43,7 +43,7 @@ class LibWindow(QMainWindow):
         row = 0
         song: 'Song'
         for song in library.songs:
-            table.setItem(row, 1, QTableWidgetItem(song.title))
+            table.setItem(row, 0, QTableWidgetItem(song.title))
             table.setItem(row, 1, QTableWidgetItem(song.album.albumName))
             table.setItem(row, 2, QTableWidgetItem(song.artist.artistName))
             row += 1
@@ -55,7 +55,7 @@ def main():
     """Start application."""
     # with open('library.pickle', 'rb') as f:
     #    library = pickle.load(f)
-    path = r"M:\music\m4\3 Doors Down"
+    path = r"M:\music\m4\Таня Буланова"
     library = Library(path)
     musicLibApp = QApplication([])
     musicLibWindow = LibWindow(library)
