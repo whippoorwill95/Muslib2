@@ -1,14 +1,17 @@
 """doc."""
 
 
-from mutagen.id3 import ID3, ID3NoHeaderError
+from typing import Set
+from mutagen.id3 import ID3
+# from mutagen.id3 import ID3NoHeaderError
+from Library.Artist import Artist
+from Library.Album import Album
 from Library.Song import Song
+import os
+import re
 # from collections import deque
 # this shit is broken what deque is?
 
-
-# It's a plug
-from Utils.Search import find
 import logging
 import logging.config
 from logs.settings import logger_config
@@ -19,103 +22,164 @@ logger = logging.getLogger('app_logger')
 class Library:
     """doc."""
 
-    def __init__(self, source=None):
-        """doc. Source should be dir."""
-        self.songs = list()
-        self.albums = dict()
-        self.artists = dict()
-        if source is not None:
-            for item in find(source, "*.[mf][pl][3a]*"):
+    def __init__(self, regexPattern=None, source=None, ):
+        """doc. Source should be dir.
+
+        dictionary "__artists" has string key (artistName) and value of Atist object
+        dictionary "__albums" has two string keys (albumName, artistName) and value of Album object
+        these dictionaries are filled in the Song constructor. I did that since object of class Song has property-refference to Artist and Album objects
+        """
+        Albums = dict[tuple[str, str], Album]
+        Artists = dict[str, Artist]
+        Songs = list[Song]
+        self.__songs = Songs()
+        self.__albums = Albums()
+        self.__artists = Artists()
+        if (source is not None) and (regexPattern is not None):
+            _templist = list()
+            # I want to make temporary list of full file pathes which is destroyed after library is stuffed. But i'm not sure if i do right
+            for address, dirs, files in os.walk(source):
+                for name in files:
+                    _templist.append(f"{os.path.join(address, name)}")
+
+            # Calling constructor of class Song which cause constructors of Album & Artist classes.
+            for item in _templist:
                 try:
-                    song = ID3(item)
-                    self.songs.append(Song(song["TIT2"].text[0], item, song["TALB"].text[0],
-                                      self.albums, song['TPE1'].text[0], self.artists))
+                    if re.search(regexPattern, item):
+                        song = ID3(item)
+                        self.__songs.append(Song(song["TIT2"].text[0], item, song["TALB"].text[0],
+                                          self.__albums, song['TPE1'].text[0], self.__artists))
                 except:
-                    logger.exception(f'item = {item}')
+                    # logger.exception(f'item = {item}')
                     pass
 
     def aplyTagToAllLibrary(self, tagName: str) -> None:
         """doc."""
-        for song in self.songs:
+        for song in self.__songs:
             song.userTags.add(tagName)
 
     def makePlaylistFromUserTag(self, tagName: str) -> None:
-        """One Tag at start."""
+        """Need to complete."""
         with open("pl.m3u8", "w", encoding="utf-8") as file:
             file.write("#EXTM3U" + "\n")
-            for song in self.songs:
+            for song in self.__songs:
                 if tagName in song.userTags:
-                    # if song != deque(self.songs, 1):
-                    if song != self.songs[-1]:
+                    # if song != deque(self.__songs, 1):
+                    if song != self.__songs[-1]:
                         file.write(song.path + "\n")
                     else:
                         file.write(song.path)
 
     def checkArtistNamesOnCaseDiversity(self) -> str:
-        """doc."""
-        for song in self.songs:
-            for key in self.artists.keys():
+        """Need to complete."""
+        for song in self.__songs:
+            for key in self.__artists.keys():
                 if song.artist.artistName.lower() == key.lower():
                     if song.artist.artistName != key:
                         print(song.artist.artistName, "!=", key)
                         return "fucked"
         return "seems nothing wrong"
 
-    # def addToLibrary(self, source: str) -> None:
-    #     """Add to library."""
-    #     for item in find(source, "*.[mf][pl][3a]*"):
-    #         song = eyed3.load(item)
-    #         self.songs.append(Song(song.tag.title, item, song.tag.album,
-    #                                self.albums, song.tag.artist, self.artists))
+    def addToLibrary(self, source: str) -> None:
+        """Need to complete."""
+        for item in source:
+            song = ID3(item)
+            self.__songs.append(Song(song.tag.title, item, song.tag.album,
+                                   self.__albums, song.tag.artist, self.__artists))
+        pass
 
-    def aplyTagToSong(self, title: str, artistName: str, tagName: str) -> None:
+    def addTagsToSong(self, songTitle: str, artistName: str, *tags: Set[str]) -> None:
         """Tag to song."""
-        # need to add check for versions of songs. I mean should i just transfer albumName to it or?..
-        for song in self.songs:
-            if title == song.title & song.artist.artistName == artistName:
-                song.userTags.add(tagName)
+        # need to add check for versions of __songs. I mean should i just transfer albumName to it or?..
+        for song in self.__songs:
+            if songTitle == song.title & song.artist.artistName == artistName:
+                for tag in tags:
+                    song.userTags.add(tag)
 
-    def aplyTagToAlbum(self, albumName: str, tagName: str) -> None:
-        """Tag to songs of album."""
-        for album in self.albums:
-            if albumName == album.albumName:
-                for song in album.songs:
-                    song.userTags.add(tagName)
+    def addTagsToAlbum(self, albumName: str, artistName: str, *tags: Set[str]) -> None:
+        """Tag to __songs of album."""
+        # compositeKey[0] is albumName and compositeKey[1] is artistName
+        for compositeKey, album in self.__albums.items():
+            if (albumName == compositeKey[0]) and (artistName == compositeKey[1]):
+                for song in album.__songs:
+                    for tag in tags:
+                        song.userTags.add(tag)
 
-    def aplyTagToArtist(self, artistName: str, tagName: str) -> None:
-        """Tag to songs by artist."""
-        for artist in self.artists:
-            if artistName == artist.artistName:
-                for song in artist.songs:
-                    song.userTags.add(tagName)
+    def addTagsToArtist(self, artistName: str, *tags: Set[str]) -> None:
+        """Tag to __songs by artist."""
+        for artistNameKey, artist in self.__artists.items():
+            if artistName == artistNameKey:
+                for song in artist.__songs:
+                    for tag in tags:
+                        song.userTags.add(tag)
 
-    def deleteTagFromSong(self, title: str, artistName: str, tagName: str) -> None:
+    def deleteTagsFromSong(self, title: str, artistName: str, *tags: Set[str]) -> None:
         """Delete tag from song."""
-        for song in self.songs:
-            if (title == song.title) & (artistName == song.artist.artistName):
-                if tagName in song.userTags:
-                    song.userTags.remove(tagName)
+        for song in self.__songs:
+            if (title == song.title) and (artistName == song.artist.artistName):
+                if tags[0] != "clear":
+                    for tag in tags:
+                        if tag in song.userTags:
+                            song.userTags.remove(tag)
+                else:
+                    song.userTags.clear()
 
-    def deleteTagFromAlbum(self, albumName: str, tagName: str) -> None:
+    def deleteTagsFromAlbum(self, albumName: str, artistName: str, *tags: Set[str]) -> None:
         """Delete tag from album."""
-        for album in self.albums:
-            if albumName == album.albumName:
-                for song in album.songs:
-                    if tagName in song.userTags:
-                        song.userTags.remove(tagName)
+        # compositeKey[0] is albumName and compositeKey[1] is artistName
+        for compositeKey, album in self.__albums.items():
+            if (albumName == compositeKey[0]) and (artistName == compositeKey[1]):
+                if tags[0] != "clear":
+                    for song in album.__songs:
+                        for tag in tags:
+                            if tag in song.userTags:
+                                song.userTags.remove(tag)
+                else:
+                    for song in album.__songs:
+                        song.userTags.clear()
 
-    def deleteTagFromArtist(self, artistName: str, tagName: str) -> None:
+    def deleteTagsFromArtist(self, artistName: str, *tags: Set[str]) -> None:
         """Delete tag from artist."""
-        for artist in self.artists:
-            if artistName == artist.artistName:
-                for song in artist.songs:
-                    if tagName in song.userTags:
-                        song.userTags.remove(tagName)
+        for artistNameKey, artist in self.__artists.items():
+            if artistName == artistNameKey:
+                if tags[0] != "clear":
+                    for song in artist.__songs:
+                        for tag in tags:
+                            if tag in song.userTags:
+                                song.userTags.remove(tag)
+                else:
+                    for song in artist.__songs:
+                        song.userTags.clear()
 
     def getNumberOfSongs(self) -> int:
-        """Get amount of songs in library."""
-        return len(self.songs)
+        """Get amount of __songs in library."""
+        return len(self.__songs)
+
+    def updateID3toArtist(self, artistName: str) -> None:
+        """doc."""
+        pass
+        # artist: Artist
+        # for artistNameKey, artist in self.__artists.items():
+        #     if artistName == artistNameKey:
+        #         for song in artist.__songs:
+        #             songID3 = ID3(song.path)
+
+    def updateID3toAlbum(self, albumName: str) -> None:
+        """doc."""
+        pass
+
+    def updateID3toSong(self, songTitle: str) -> None:
+        """doc."""
+        pass
 
     def hideAuxiliaryArtists():
         """Doc."""
         pass
+
+    # ################### Below will be functions for testing and debugging library ##########################
+    def printListOfArtists(self) -> None:
+        """doc."""
+        counter = 0
+        for key, artist in self.__artists.items():
+            counter += 1
+            print(f"{counter} {artist.artistName}", end="\n")

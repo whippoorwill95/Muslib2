@@ -1,7 +1,7 @@
 """doc."""
 
 
-# import pickle
+import pickle
 import sys
 from PyQt6.QtWidgets import (
     QApplication,
@@ -24,7 +24,7 @@ if TYPE_CHECKING:
 class LibWindow(QMainWindow):
     """Main window (GUI or view)."""
 
-    def __init__(self, library):
+    def __init__(self, library: Library = None):
         """Doc."""
         super().__init__()
         self.setWindowTitle("MusicLib2")
@@ -33,31 +33,37 @@ class LibWindow(QMainWindow):
         centralWidget = QWidget(self)
         centralWidget.setLayout(generalLayout)
         self.setCentralWidget(centralWidget)
+        if library is not None:
+            table = QTableWidget()
+            table.setColumnCount(4)
+            table.setRowCount(library.getNumberOfSongs())
+            table.setHorizontalHeaderLabels(["Title", "Album", "Artist", "UserTags"])
+            table.resizeColumnsToContents()
 
-        table = QTableWidget()
-        table.setColumnCount(3)
-        table.setRowCount(library.getNumberOfSongs())
-        table.setHorizontalHeaderLabels(["Title", "Album", "Artist"])
-        table.resizeColumnsToContents()
+            row = 0
+            song: 'Song'
+            for song in library.songs:
+                table.setItem(row, 0, QTableWidgetItem(song.title))
+                table.setItem(row, 1, QTableWidgetItem(song.album.albumName))
+                table.setItem(row, 2, QTableWidgetItem(song.artist.artistName))
+                table.setItem(row, 3, QTableWidgetItem(str(song.userTags)))
+                row += 1
 
-        row = 0
-        song: 'Song'
-        for song in library.songs:
-            table.setItem(row, 0, QTableWidgetItem(song.title))
-            table.setItem(row, 1, QTableWidgetItem(song.album.albumName))
-            table.setItem(row, 2, QTableWidgetItem(song.artist.artistName))
-            row += 1
-
-        generalLayout.addWidget(table)
+            generalLayout.addWidget(table)
 
 
 def main():
     """Start application."""
-    # with open('library.pickle', 'rb') as f:
-    #    library = pickle.load(f)
-    path = r"M:\music\m4\Таня Буланова"
-    library = Library(path)
+    with open('library.pickle', 'rb') as f:
+        library = pickle.load(f)
+    path = r"M:\music\m4"
+    repattern = r'.*\.(mp3|flac|m4a)$'
+    library = Library(repattern=repattern, source=path)
+    with open('library.pickle', 'wb') as f:
+        pickle.dump(library, f)
+
     musicLibApp = QApplication([])
+    # musicLibWindow = LibWindow(library)
     musicLibWindow = LibWindow(library)
     musicLibWindow.show()
     sys.exit(musicLibApp.exec())
@@ -92,3 +98,15 @@ if __name__ == "__main__":
 #                 file.write(i[0] + "\n")
 #             else:
 #                 file.write(i[0])
+
+    # filenames = list(filter(re.compile(repattern).match, os.walk(path)))
+    # with open('debug.txt', 'w', encoding='utf-8') as f:
+    #     for item in filenames:
+    #         f.write(f"{item}\n")
+    # with open('debug.txt', 'w', encoding='utf-8') as f:
+    #     for address, dirs, files in os.walk(path):
+    #         for name in files:
+    #             f.write(f"{os.path.join(address, name)}\n")
+    # with open('debug.txt', 'r', encoding='utf-8') as f:
+    #     list = f.readlines()
+    #     print(*(x for x in list if re.search(repattern, x)), sep='\n')

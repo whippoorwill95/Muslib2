@@ -29,3 +29,6 @@ class Song:
             self.album = albums[(albumName, artistName)]
         self.album.addSong(self)
         self.artist.addSong(self)
+
+    def changeProperties(self, title: str = None, path: str = None, albumName: str = None, artistName: str = None) -> None:
+        pass
