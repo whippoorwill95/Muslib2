@@ -20,6 +20,7 @@ logger = logging.getLogger('app_logger')
 
 
 class Library:
+    # Реализовать __bool__
     """doc."""
 
     def __init__(self, regexPattern=None, source=None, ):
@@ -48,10 +49,26 @@ class Library:
                     if re.search(regexPattern, item):
                         song = ID3(item)
                         self.__songs.append(Song(song["TIT2"].text[0], item, song["TALB"].text[0],
-                                          self.__albums, song['TPE1'].text[0], self.__artists))
+                                            self.__albums, song['TPE1'].text[0], self.__artists))
                 except:
                     # logger.exception(f'item = {item}')
                     pass
+        # self.GetRidOfFeatArtists()
+
+    @property
+    def songs(self):
+        """doc."""
+        return self.__songs
+
+    @property
+    def artists(self):
+        """doc."""
+        return self.__artists
+
+    @property
+    def albums(self):
+        """doc."""
+        return self.__albums
 
     def aplyTagToAllLibrary(self, tagName: str) -> None:
         """doc."""
@@ -85,7 +102,7 @@ class Library:
         for item in source:
             song = ID3(item)
             self.__songs.append(Song(song.tag.title, item, song.tag.album,
-                                   self.__albums, song.tag.artist, self.__artists))
+                                     self.__albums, song.tag.artist, self.__artists))
         pass
 
     def addTagsToSong(self, songTitle: str, artistName: str, *tags: Set[str]) -> None:
@@ -172,11 +189,28 @@ class Library:
         """doc."""
         pass
 
-    def hideAuxiliaryArtists():
+    def GetRidOfFeatArtists(self):
         """Doc."""
-        pass
+        __auxArtists = {}
+        regex = r'(?i), | & | feat. |; '
+        V = 3
+        for artistName in self.__artists.copy():
+            if len(self.__artists[artistName].songs) < V:
+                __auxArtists[artistName] = self.__artists[artistName]
+                self.__artists.pop(artistName)
+        for ka in __auxArtists.copy():
+            sa = set(re.split(regex, ka))
+            for k in self.__artists:
+                if set(re.split(regex, k)).issubset(sa):
+                    for song in __auxArtists[ka].songs:
+                        song.artist = self.__artists[k]
+                    for album in __auxArtists[ka].albums:
+                        album.artist = self.__artists[k]
+                    self.__artists[k].songs = self.__artists[k].songs | __auxArtists[ka].songs
+                    self.__artists[k].albums = self.__artists[k].songs | __auxArtists[ka].albums
+                    __auxArtists.pop(ka)
 
-    # ################### Below will be functions for testing and debugging library ##########################
+# ################### Below will be functions for testing and debugging library ##########################
     def printListOfArtists(self) -> None:
         """doc."""
         counter = 0

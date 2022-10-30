@@ -30,5 +30,14 @@ class Song:
         self.album.addSong(self)
         self.artist.addSong(self)
 
+    def __repr__(self) -> str:
+        """doc."""
+        return self.title
+
+    def __lt__(self, other):
+        """doc."""
+        return self.title < other.title
+
     def changeProperties(self, title: str = None, path: str = None, albumName: str = None, artistName: str = None) -> None:
+        """doc."""
         pass

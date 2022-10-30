@@ -18,6 +18,14 @@ class Album:
         self.songs = {song}
         self.artist = artist
 
+    def __repr__(self) -> str:
+        """doc."""
+        return self.albumName
+
+    def __lt__(self, other):
+        """doc."""
+        return self.albumName < other.albumName
+
     def addSong(self, song: 'Song') -> None:
         """doc."""
         self.songs.add(song)
